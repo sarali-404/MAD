@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:Farmingapp/welcome_page.dart';  // Import WelcomePage
+import 'package:Farmingapp/welcome_page.dart';  // Ensure WelcomePage exists
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({Key? key}) : super(key: key);
@@ -13,18 +13,20 @@ class _LoadingPageState extends State<LoadingPage> {
   void initState() {
     super.initState();
     // Navigate to WelcomePage after 3 seconds
-    Future.delayed(Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const WelcomePage()),
-      );
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const WelcomePage()),
+        );
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF6F7755),
+      backgroundColor: const Color(0xFF592507),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -33,34 +35,39 @@ class _LoadingPageState extends State<LoadingPage> {
             Container(
               height: 140,
               width: 140,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 color: Color(0xFFB9B089),
               ),
               child: Center(
-                child: Icon(Icons.agriculture, size: 70, color: Colors.white),
+                child: Image.asset(
+                  'assets/logo.png', // Ensure the asset is correctly added
+                  width: 100, // Adjust width as needed
+                  height: 100, // Adjust height as needed
+                  fit: BoxFit.cover, // Adjust image fit
+                ),
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20), // Correctly placed SizedBox
+            const Text(
               "AgroLink",
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 28,
+                fontSize: 34,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 10),
-            CircularProgressIndicator(
+            const SizedBox(height: 10),
+            const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               "Loading...",
               style: TextStyle(
                 color: Colors.white70,
-                fontSize: 14,
+                fontSize: 22,
                 fontWeight: FontWeight.w300,
               ),
               textAlign: TextAlign.center,

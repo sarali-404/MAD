@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:Farmingapp/add_product_page.dart';      // Import Add Product Page
-import 'package:Farmingapp/seller_profile_page.dart';   // Import Seller Profile Page
-import 'package:Farmingapp/chat_page.dart';             // Import Chat Page
+import 'package:Farmingapp/seller_profile_page.dart'; // Import Seller Profile Page
+import 'package:Farmingapp/chat_page.dart';          // Import Chat Page
+import 'package:Farmingapp/welcome_page.dart';      // Import Welcome Page
+import 'package:Farmingapp/add_product_page.dart';  // Import Add Product Page
 
 class SellerDashboard extends StatelessWidget {
   const SellerDashboard({Key? key}) : super(key: key);
@@ -13,34 +14,35 @@ class SellerDashboard extends StatelessWidget {
         'name': 'Seed Paddy',
         'description': 'The best Seed paddy',
         'price': 500.00,
-        'image': 'assets/images/seed_paddy.png',
+        'image': 'assets/image2.png',
       },
       {
-        'name': 'Seed Paddy',
-        'description': 'The best Seed paddy',
-        'price': 500.00,
-        'image': 'assets/images/seed_paddy.png',
+        'name': 'Organic Fertilizer',
+        'description': 'Natural organic fertilizers',
+        'price': 900.00,
+        'image': 'assets/image2.png',
       },
       {
-        'name': 'Seed Paddy',
-        'description': 'The best Seed paddy',
-        'price': 500.00,
-        'image': 'assets/images/seed_paddy.png',
-      },
-      {
-        'name': 'Seed Paddy',
-        'description': 'The best Seed paddy',
-        'price': 500.00,
-        'image': 'assets/images/seed_paddy.png',
+        'name': 'Maize Seeds',
+        'description': 'High-quality maize seeds',
+        'price': 600.00,
+        'image': 'assets/image2.png',
       },
     ];
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6F7755),
-        title: const Text('My Products'),
+        backgroundColor: const Color(0xFF8C624A),
         centerTitle: true,
+        title: const Text(
+          'My Products',  // ✅ AppBar Title
+          style: TextStyle(
+            fontSize: 22,  // ✅ Manually Set Font Size
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -54,7 +56,7 @@ class SellerDashboard extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final product = products[index];
                   return Card(
-                    color: const Color(0xFFD6D5C7),
+                    color: const Color(0xFFD9DFC7),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -64,7 +66,7 @@ class SellerDashboard extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Product Image
+                          // ✅ Product Image
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8.0),
                             child: Image.asset(
@@ -73,7 +75,6 @@ class SellerDashboard extends StatelessWidget {
                               height: 80,
                               fit: BoxFit.cover,
                               errorBuilder: (context, error, stackTrace) {
-                                // Handle image not found error
                                 return Container(
                                   width: 80,
                                   height: 80,
@@ -88,7 +89,7 @@ class SellerDashboard extends StatelessWidget {
                           ),
                           const SizedBox(width: 10),
 
-                          // Product Details
+                          // ✅ Product Details
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,16 +97,16 @@ class SellerDashboard extends StatelessWidget {
                                 Text(
                                   product['name'],
                                   style: const TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 20,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black87,
+                                    color: Colors.black,
                                   ),
                                 ),
                                 const SizedBox(height: 5),
                                 Text(
                                   product['description'],
                                   style: const TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     color: Colors.black54,
                                   ),
                                 ),
@@ -115,19 +116,19 @@ class SellerDashboard extends StatelessWidget {
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF6F7755),
+                                    color: Colors.black,
                                   ),
                                 ),
                               ],
                             ),
                           ),
 
-                          // Edit and Delete Buttons
+                          // ✅ Edit and Delete Buttons
                           Column(
                             children: [
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFF6F7755),
+                                  backgroundColor: const Color(0xFF6BAC36),
                                   minimumSize: const Size(60, 30),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -138,9 +139,7 @@ class SellerDashboard extends StatelessWidget {
                                 },
                                 child: const Text(
                                   'Edit',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                  ),
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               ),
                               const SizedBox(height: 5),
@@ -157,9 +156,7 @@ class SellerDashboard extends StatelessWidget {
                                 },
                                 child: const Text(
                                   'Delete',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                  ),
+                                  style: TextStyle(color: Colors.black),
                                 ),
                               ),
                             ],
@@ -172,13 +169,13 @@ class SellerDashboard extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              // Add New Product Button
+              // ✅ Restored "Add New Product" Button
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6F7755),
+                  backgroundColor: const Color(0xFFD3E597),
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
                 onPressed: () {
@@ -188,8 +185,8 @@ class SellerDashboard extends StatelessWidget {
                   );
                 },
                 child: const Text(
-                  'Add new product',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
+                  'Add New Product',
+                  style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -197,8 +194,11 @@ class SellerDashboard extends StatelessWidget {
         ),
       ),
 
-      // Bottom Navigation Bar
+      // ✅ Updated Bottom Navigation Bar with Leave Button
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF592507), // Background Color Added
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white54,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -209,12 +209,10 @@ class SellerDashboard extends StatelessWidget {
             label: 'Messages',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add),
-            label: 'Add',
+            icon: Icon(Icons.exit_to_app), // ✅ Changed to Leave Icon
+            label: 'Leave',
           ),
         ],
-        selectedItemColor: const Color(0xFF6F7755),
-        unselectedItemColor: Colors.grey,
         onTap: (index) {
           if (index == 0) {
             Navigator.push(
@@ -227,9 +225,9 @@ class SellerDashboard extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const ChatPage()),
             );
           } else if (index == 2) {
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => const AddProductPage()),
+              MaterialPageRoute(builder: (context) => const WelcomePage()),
             );
           }
         },

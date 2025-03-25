@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:Farmingapp/seller_profile_page.dart';  // Import Seller Profile Page
+import 'package:Farmingapp/seller_profile_page.dart'; // Import Seller Profile Page
+import 'package:Farmingapp/seller_dashboard.dart';  // Import Seller Dashboard
 
 class ChatPage extends StatelessWidget {
   const ChatPage({Key? key}) : super(key: key);
@@ -11,22 +12,30 @@ class ChatPage extends StatelessWidget {
           (index) => {
         'name': 'Sarali',
         'message': 'Hi,',
-        'image': 'assets/images/profile.png',
+        'image': 'assets/image2.png',
       },
     );
 
     return Scaffold(
       backgroundColor: Colors.white,
+
+      // ✅ AppBar
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6F7755),
-        title: const Text('Chats'),
+        backgroundColor: const Color(0xFF8C624A),
+        elevation: 0,
         centerTitle: true,
+        title: const Text(
+          'Chats',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
       ),
+
+      // ✅ Scrollable Chat List with Search & Filters
       body: Padding(
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
-            // Search Bar
+            // ✅ Search Bar
             Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFD6D5C7),
@@ -44,7 +53,7 @@ class ChatPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // Filter Chips
+            // ✅ Filter Chips
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -57,7 +66,7 @@ class ChatPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // Chat List
+            // ✅ Chat List
             Expanded(
               child: ListView.builder(
                 itemCount: chats.length,
@@ -69,7 +78,7 @@ class ChatPage extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      color: const Color(0xFFD6D5C7),
+                      color: const Color(0xFFFFEDDC),
                       child: ListTile(
                         leading: ClipRRect(
                           borderRadius: BorderRadius.circular(50),
@@ -117,43 +126,47 @@ class ChatPage extends StatelessWidget {
         ),
       ),
 
-      // Floating Action Button
+      // ✅ Floating Action Button for New Chats
       floatingActionButton: FloatingActionButton(
-        backgroundColor: const Color(0xFF6F7755),
+        backgroundColor: const Color(0xFF8C624A),
         onPressed: () {
           // Handle new chat
         },
         child: const Icon(Icons.add, color: Colors.white, size: 30),
       ),
 
-      // Bottom Navigation Bar
+      // ✅ Updated Bottom Navigation Bar with Text Labels
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xFF592507), // Background Color Updated
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white54,
+        currentIndex: 1, // Highlight 'Chats' as active
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_bag),
-            label: 'Orders',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite),
-            label: 'Favorites',
+            label: 'Profile', // ✅ Added Label
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.message),
-            label: 'Chats',
+            label: 'Chats', // ✅ Added Label
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home', // ✅ Added Label
           ),
         ],
-        selectedItemColor: const Color(0xFF6F7755),
-        unselectedItemColor: Colors.grey,
-        currentIndex: 3,  // Highlight 'Chats' as active
         onTap: (index) {
           if (index == 0) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const SellerProfilePage()),
+            );
+          } else if (index == 1) {
+            // Stay on Chat Page
+          } else if (index == 2) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SellerDashboard()),
             );
           }
         },
@@ -161,7 +174,7 @@ class ChatPage extends StatelessWidget {
     );
   }
 
-  // Custom Filter Chip Builder
+  // ✅ Custom Filter Chip Builder
   Widget _buildFilterChip(String label, bool isSelected) {
     return ChoiceChip(
       label: Text(
@@ -172,7 +185,7 @@ class ChatPage extends StatelessWidget {
         ),
       ),
       selected: isSelected,
-      selectedColor: const Color(0xFF6F7755),
+      selectedColor: const Color(0xFF8C624A),
       backgroundColor: const Color(0xFFD6D5C7),
       onSelected: (selected) {
         // Handle chip selection

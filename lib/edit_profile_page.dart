@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:Farmingapp/profile_page.dart'; // ✅ Import Profile Page
 
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({Key? key}) : super(key: key);
@@ -8,13 +9,13 @@ class EditProfilePage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF6F7755),
+        backgroundColor: const Color(0xFF8C624A),
         title: const Text('Edit Profile'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Navigator.pop(context); // ✅ Navigate Back
           },
         ),
       ),
@@ -27,9 +28,9 @@ class EditProfilePage extends StatelessWidget {
             Center(
               child: Stack(
                 children: [
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 50,
-                    backgroundImage: AssetImage('assets/images/profile.png'),
+                    backgroundImage: AssetImage('assets/image2.png'),
                   ),
                   Positioned(
                     bottom: 0,
@@ -53,11 +54,11 @@ class EditProfilePage extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Name Field
-            _buildTextField('Name', 'Sarali Balasinghe'),
+            _buildTextField('Name', 'Rahul'),
             const SizedBox(height: 15),
 
             // Email / Phone Field
-            _buildTextField('Email / Phone number', 'sarali@gmail.com'),
+            _buildTextField('Email / Phone number', 'rahul@gmail.com'),
             const SizedBox(height: 15),
 
             // Description Field
@@ -68,7 +69,7 @@ class EditProfilePage extends StatelessWidget {
             _buildTextField('Location', 'Kottawa'),
             const SizedBox(height: 30),
 
-            // Save Changes Button
+            // ✅ Save Changes Button (Navigates to Profile Page)
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6F7755),
@@ -78,7 +79,11 @@ class EditProfilePage extends StatelessWidget {
                 ),
               ),
               onPressed: () {
-                // Handle Save Changes
+                // ✅ Navigate to Profile Page
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ProfilePage()),
+                );
               },
               child: const Text(
                 'Save changes',
@@ -87,29 +92,6 @@ class EditProfilePage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.message),
-            label: 'Messages',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.store),
-            label: 'Shop',
-          ),
-        ],
-        selectedItemColor: const Color(0xFF6F7755),
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          if (index == 0) {
-            Navigator.pushNamed(context, '/seller_profile');
-          }
-        },
       ),
     );
   }
@@ -131,7 +113,7 @@ class EditProfilePage extends StatelessWidget {
         TextField(
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFFD6D5C7),
+            fillColor: const Color(0xFFFFEDDC),
             hintText: hintText,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),

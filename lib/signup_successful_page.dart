@@ -16,16 +16,16 @@ class SignUpSuccessfulPage extends StatelessWidget {
             children: [
               const Icon(
                 Icons.check_circle,
-                color: Color(0xFF6F7755),
-                size: 80,
+                color: Color(0xFFD3E597),
+                size: 100,
               ),
               const SizedBox(height: 20),
               const Text(
                 "Your Sign Up was successful!",
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Colors.black,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -33,7 +33,7 @@ class SignUpSuccessfulPage extends StatelessWidget {
               const Text(
                 "Welcome to AgroLink!",
                 style: TextStyle(
-                  fontSize: 16,
+                  fontSize: 18,
                   color: Colors.black54,
                 ),
                 textAlign: TextAlign.center,
@@ -41,7 +41,7 @@ class SignUpSuccessfulPage extends StatelessWidget {
               const SizedBox(height: 30),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6F7755),
+                  backgroundColor: const Color(0xFFD3E597),
                   minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
@@ -55,7 +55,7 @@ class SignUpSuccessfulPage extends StatelessWidget {
                   "Continue to Home",
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 18,
                   ),
                 ),
               ),
