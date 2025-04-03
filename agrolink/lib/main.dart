@@ -1,122 +1,280 @@
+import 'package:Farmingapp/auth_page.dart';
+import 'package:Farmingapp/services/auth_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:Farmingapp/loarding_page.dart';
+import 'package:Farmingapp/welcome_page.dart';
+import 'package:Farmingapp/login_page.dart';
+import 'package:Farmingapp/signup_page.dart';
+import 'package:Farmingapp/signup_successful_page.dart';
+import 'package:Farmingapp/farmer_dashboard.dart';
+import 'package:Farmingapp/product_details_page.dart';
+import 'package:Farmingapp/cart_page.dart';
+import 'package:Farmingapp/profile_page.dart';
+import 'package:Farmingapp/editprofilepage.dart';
+import 'package:Farmingapp/seller_dashboard.dart';
+import 'package:Farmingapp/seller_profile_page.dart';
+import 'package:Farmingapp/add_product_page.dart';
+import 'package:Farmingapp/chat_page.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'firebase_service.dart';
+import 'package:Farmingapp/auth/simple_signup_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  try {
+    print('🔷 Initializing Firebase...');
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    
+    // Configure error reporting
+    final auth = FirebaseAuth.instance;
+    auth.authStateChanges().listen((User? user) {
+      print('🔐 Auth state changed: ${user != null ? "User logged in" : "User logged out"}');
+    }, onError: (error) {
+      print('❌ Auth state error: $error');
+    });
+    
+    print('✅ Firebase initialized successfully!');
+  } catch (e) {
+    print('❌ Firebase initialization error: $e');
+  }
+  
+  // Handle Flutter errors
+  FlutterError.onError = (details) {
+    print('🚨 Flutter error: ${details.exception}');
+    print('🚨 Stack trace: ${details.stack}');
+  };
+  
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Farming App',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primaryColor: const Color(0xFF6F7755),
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          primary: const Color(0xFF6F7755),
+          secondary: const Color(0xFFD6D5C7),
+        ),
+        fontFamily: 'Roboto',
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF6F7755),
+          elevation: 0,
+        ),
+        textTheme: const TextTheme(
+          bodyMedium: TextStyle(color: Colors.black87),  // Fixed bodyMedium usage
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF6F7755),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            textStyle: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+            ),
+          ),
+        ),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const SplashScreen(),
+      routes: {
+        '/welcome': (context) => const WelcomePage(),
+        '/login': (context) => const LoginPage(),
+        '/signup': (context) => const SimpleSignupPage(),
+        '/signup_successful': (context) => const SignUpSuccessfulPage(),
+        '/farmer_dashboard': (context) => const FarmerDashboard(),
+        '/cart': (context) => const CartPage(),
+        '/product_details': (context) => const ProductDetailsPage(
+          name: 'Seed Paddy',
+          price: 'Rs. 500.00',
+          image: 'assets/images/seed_paddy.png',
+        ),
+        '/profile': (context) => const ProfilePage(),
+        '/edit_profile': (context) => const EditProfilePage(),
+        '/seller_dashboard': (context) => const SellerDashboard(),
+        '/seller_profile': (context) => const SellerProfilePage(),
+        '/add_new_product': (context) => const AddProductPage(),
+        '/simple_signup': (context) => const SimpleSignupPage(),
+      },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+// Add new SplashScreen widget
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({Key? key}) : super(key: key);
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthAndNavigate();
+  }
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
+  Future<void> _checkAuthAndNavigate() async {
+    try {
+      print('🔍 Starting auth check...');
+      await Future.delayed(const Duration(seconds: 2));
+      
+      if (!mounted) return;
+
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print('👤 No user logged in');
+        Navigator.pushReplacementNamed(context, '/welcome');
+        return;
+      }
+
+      print('✅ Found logged in user: ${user.uid}');
+
+      // Get user profile with retry logic
+      DocumentSnapshot? userDoc;
+      for (int i = 0; i < 3; i++) {
+        try {
+          userDoc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .get();
+          
+          if (userDoc.exists) break;
+          
+          print('⚠️ Attempt ${i + 1}: User document not found');
+          await Future.delayed(Duration(milliseconds: 500));
+        } catch (e) {
+          print('❌ Error getting user data (attempt ${i + 1}): $e');
+        }
+      }
+
+      if (!userDoc!.exists) {
+        print('❌ No user profile found');
+        await FirebaseAuth.instance.signOut();
+        if (mounted) Navigator.pushReplacementNamed(context, '/welcome');
+        return;
+      }
+
+      final data = userDoc.data() as Map<String, dynamic>;
+      final userType = data['userType'] as String?;
+      
+      print('👤 User type found: $userType');
+
+      if (mounted) {
+        if (userType == 'Seller') {
+          print('🚀 Navigating to seller dashboard');
+          Navigator.pushReplacementNamed(context, '/seller_dashboard');
+        } else {
+          print('🚀 Navigating to farmer dashboard');
+          Navigator.pushReplacementNamed(context, '/farmer_dashboard');
+        }
+      }
+    } catch (e) {
+      print('❌ Error in auth check: $e');
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/welcome');
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    return const LoadingPage();
+  }
+}
+
+// Simple authentication checking page
+class AuthCheckPage extends StatelessWidget {
+  const AuthCheckPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<User?>(
+      // Use a Future instead of Stream for less chance of casting errors
+      future: Future.delayed(
+        const Duration(milliseconds: 500), 
+        () => FirebaseAuth.instance.currentUser
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      builder: (context, snapshot) {
+        // Show loading indicator while waiting
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const LoadingPage();
+        }
+        
+        // If user is logged in
+        if (snapshot.hasData && snapshot.data != null) {
+          // Get the user and check their type
+          _checkUserType(context, snapshot.data!.uid);
+          return const LoadingPage();
+        }
+        
+        // No user is signed in
+        return const WelcomePage();
+      },
     );
+  }
+  
+  // Function to check user type and navigate accordingly
+  void _checkUserType(BuildContext context, String uid) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(uid)
+        .get()
+        .then((doc) {
+          if (doc.exists) {
+            final data = doc.data();
+            final userType = data?['userType'] as String? ?? 'Farmer';
+            
+            if (userType == 'Farmer') {
+              Navigator.pushReplacementNamed(context, '/farmer_dashboard');
+            } else {
+              Navigator.pushReplacementNamed(context, '/seller_dashboard');
+            }
+          } else {
+            // No user document, create a basic one
+            _createBasicProfile(context, uid);
+          }
+        })
+        .catchError((error) {
+          print('Error checking user type: $error');
+          // Default to farmer dashboard
+          Navigator.pushReplacementNamed(context, '/farmer_dashboard');
+        });
+  }
+  
+  // Create a basic profile if one doesn't exist
+  Future<void> _createBasicProfile(BuildContext context, String uid) async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) return;
+      
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'uid': uid,
+        'email': user.email ?? '',
+        'username': user.email?.split('@')[0] ?? 'User',
+        'phoneNumber': '',
+        'userType': 'Farmer',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      
+      Navigator.pushReplacementNamed(context, '/farmer_dashboard');
+    } catch (e) {
+      print('Error creating basic profile: $e');
+      Navigator.pushReplacementNamed(context, '/farmer_dashboard');
+    }
   }
 }
