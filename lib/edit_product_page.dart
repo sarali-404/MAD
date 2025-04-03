@@ -1,34 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:Farmingapp/seller_profile_page.dart';
-import 'package:Farmingapp/chat_page.dart';
-import 'package:Farmingapp/seller_dashboard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:Farmingapp/services/notifications_service.dart';
+import 'package:Farmingapp/seller_dashboard.dart';
+import 'package:Farmingapp/seller_profile_page.dart';
+import 'package:Farmingapp/chat_page.dart';
 
-class AddProductPage extends StatefulWidget {
-  const AddProductPage({Key? key}) : super(key: key);
+class EditProductPage extends StatefulWidget {
+  final String productId;
+  final Map<String, dynamic> productData;
+
+  const EditProductPage({
+    Key? key,
+    required this.productId,
+    required this.productData,
+  }) : super(key: key);
 
   @override
-  _AddProductPageState createState() => _AddProductPageState();
+  _EditProductPageState createState() => _EditProductPageState();
 }
 
-class _AddProductPageState extends State<AddProductPage> {
+class _EditProductPageState extends State<EditProductPage> {
   final _formKey = GlobalKey<FormState>();
   String? selectedCategory;
   bool _isLoading = false;
-  bool _isAddingCategory = false;
+  bool _isEditingCategory = false;
   final _newCategoryController = TextEditingController();
   
-  // Controllers for form fields
-  final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _detailsController = TextEditingController();
-  final _priceController = TextEditingController();
-  final _stockController = TextEditingController();
+  // Form controllers
+  late final TextEditingController _nameController;
+  late final TextEditingController _descriptionController;
+  late final TextEditingController _detailsController;
+  late final TextEditingController _priceController;
+  late final TextEditingController _stockController;
   
-  // Categories - modified to allow addition of new categories
+  // Categories list
   List<String> _categories = ['Seeds', 'Fertilizers', 'Tools', 'Equipment', 'Other'];
+  
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers with existing product data
+    _nameController = TextEditingController(text: widget.productData['name'] as String);
+    _descriptionController = TextEditingController(text: widget.productData['description'] as String? ?? '');
+    _detailsController = TextEditingController(text: widget.productData['details'] as String? ?? '');
+    _priceController = TextEditingController(text: (widget.productData['price'] as num).toString());
+    _stockController = TextEditingController(text: (widget.productData['stock'] as num).toString());
+    selectedCategory = widget.productData['category'] as String?;
+    
+    // Add the product category to the list if it's not already there
+    if (selectedCategory != null && !_categories.contains(selectedCategory)) {
+      _categories.add(selectedCategory!);
+    }
+  }
   
   @override
   void dispose() {
@@ -41,7 +64,25 @@ class _AddProductPageState extends State<AddProductPage> {
     super.dispose();
   }
   
-  Future<void> _uploadProduct() async {
+  void _addNewCategory() {
+    final newCategory = _newCategoryController.text.trim();
+    if (newCategory.isNotEmpty && !_categories.contains(newCategory)) {
+      setState(() {
+        _categories.add(newCategory);
+        selectedCategory = newCategory;
+        _isEditingCategory = false;
+        _newCategoryController.clear();
+      });
+      
+      _showMessage('Added new category: $newCategory');
+    } else if (_categories.contains(newCategory)) {
+      _showMessage('This category already exists', isError: true);
+    } else {
+      _showMessage('Please enter a category name', isError: true);
+    }
+  }
+  
+  Future<void> _updateProduct() async {
     if (!_formKey.currentState!.validate()) {
       _showMessage('Please fill all required fields', isError: true);
       return;
@@ -57,65 +98,32 @@ class _AddProductPageState extends State<AddProductPage> {
     });
     
     try {
-      print('📤 Starting product upload process...');
-      final user = FirebaseAuth.instance.currentUser;
-      if (user == null) {
-        _showMessage('You must be logged in to add products', isError: true);
-        return;
-      }
-      
-      // Get seller information for the product
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.uid)
-          .get();
-      
-      final sellerName = userDoc.data()?['username'] ?? userDoc.data()?['name'] ?? 'Unknown Seller';
-      
-      // Standard image path that will work across app
-      final imagePath = 'assets/fertilizer1.png';
-      
-      // Create complete product data with all required fields
-      final productData = {
-        'sellerId': user.uid,
-        'sellerName': sellerName,
+      // Create updated product data
+      final updatedProductData = {
         'name': _nameController.text.trim(),
         'description': _descriptionController.text.trim(),
         'details': _detailsController.text.trim(),
         'price': double.tryParse(_priceController.text) ?? 0.0,
         'stock': int.tryParse(_stockController.text) ?? 0,
         'category': selectedCategory,
-        'image': imagePath,
-        'createdAt': FieldValue.serverTimestamp(),
-        'isHidden': false,
+        'updatedAt': FieldValue.serverTimestamp(),
       };
       
-      // Add to Firestore and get the ID
-      final docRef = await FirebaseFirestore.instance
+      // Update in Firestore
+      await FirebaseFirestore.instance
           .collection('products')
-          .add(productData);
+          .doc(widget.productId)
+          .update(updatedProductData);
       
-      // Create notification for farmers about the new product
-      await NotificationsService.createProductNotification(
-        docRef.id,
-        _nameController.text.trim(),
-        user.uid
-      );
+      _showMessage('Product updated successfully');
       
-      _showMessage('Product added successfully!');
-      
-      // Clear form
-      _nameController.clear();
-      _descriptionController.clear();
-      _detailsController.clear();
-      _priceController.clear();
-      _stockController.clear();
-      setState(() {
-        selectedCategory = null;
-      });
+      // Return to dashboard with success indicator
+      if (mounted) {
+        Navigator.pop(context, true);
+      }
     } catch (e) {
-      print('Error adding product: $e');
-      _showMessage('Failed to add product: $e', isError: true);
+      print('Error updating product: $e');
+      _showMessage('Failed to update product: $e', isError: true);
     } finally {
       setState(() {
         _isLoading = false;
@@ -135,24 +143,6 @@ class _AddProductPageState extends State<AddProductPage> {
     );
   }
 
-  void _addNewCategory() {
-    final newCategory = _newCategoryController.text.trim();
-    if (newCategory.isNotEmpty && !_categories.contains(newCategory)) {
-      setState(() {
-        _categories.add(newCategory);
-        selectedCategory = newCategory;
-        _isAddingCategory = false;
-        _newCategoryController.clear();
-      });
-      
-      _showMessage('Added new category: $newCategory');
-    } else if (_categories.contains(newCategory)) {
-      _showMessage('This category already exists', isError: true);
-    } else {
-      _showMessage('Please enter a category name', isError: true);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -162,7 +152,7 @@ class _AddProductPageState extends State<AddProductPage> {
         elevation: 0,
         centerTitle: true,
         title: const Text(
-          'Add New Product',
+          'Edit Product',
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         leading: IconButton(
@@ -191,7 +181,7 @@ class _AddProductPageState extends State<AddProductPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'What type of product are you adding?',
+                      'Update product category',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -200,7 +190,7 @@ class _AddProductPageState extends State<AddProductPage> {
                     ),
                     const SizedBox(height: 12),
                     SizedBox(
-                      height: _isAddingCategory ? 100 : 50,
+                      height: _isEditingCategory ? 100 : 50,
                       child: Column(
                         children: [
                           // Category list scrollable
@@ -259,18 +249,18 @@ class _AddProductPageState extends State<AddProductPage> {
                                   child: GestureDetector(
                                     onTap: () {
                                       setState(() {
-                                        _isAddingCategory = !_isAddingCategory;
+                                        _isEditingCategory = !_isEditingCategory;
                                       });
                                     },
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                       decoration: BoxDecoration(
-                                        color: _isAddingCategory 
+                                        color: _isEditingCategory 
                                             ? Colors.red.withOpacity(0.2)
                                             : Colors.white.withOpacity(0.3),
                                         borderRadius: BorderRadius.circular(25),
                                         border: Border.all(
-                                          color: _isAddingCategory 
+                                          color: _isEditingCategory 
                                               ? Colors.red.withOpacity(0.3)
                                               : Colors.white.withOpacity(0.5),
                                           width: 2,
@@ -279,11 +269,11 @@ class _AddProductPageState extends State<AddProductPage> {
                                       child: Row(
                                         children: [
                                           Icon(
-                                            _isAddingCategory ? Icons.close : Icons.add,
+                                            _isEditingCategory ? Icons.close : Icons.add,
                                             color: Colors.white,
                                             size: 18,
                                           ),
-                                          if (!_isAddingCategory) ...[
+                                          if (!_isEditingCategory) ...[
                                             const SizedBox(width: 4),
                                             const Text(
                                               'Add New',
@@ -303,7 +293,7 @@ class _AddProductPageState extends State<AddProductPage> {
                           ),
                           
                           // New category input field
-                          if (_isAddingCategory) ...[
+                          if (_isEditingCategory) ...[
                             const SizedBox(height: 10),
                             Row(
                               children: [
@@ -532,29 +522,42 @@ class _AddProductPageState extends State<AddProductPage> {
                         ),
                         child: Row(
                           children: [
-                            // Main image preview or picker
+                            // Main image preview
                             Container(
                               width: 100,
                               height: 100,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
                                 borderRadius: BorderRadius.circular(12),
+                                image: DecorationImage(
+                                  image: AssetImage(widget.productData['image'] as String),
+                                  fit: BoxFit.cover,
+                                ),
                                 border: Border.all(color: Colors.grey.shade300),
                               ),
-                              child: const Icon(
-                                Icons.add_a_photo,
-                                color: Color(0xFF8C624A),
-                                size: 40,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Container(
+                                    color: Colors.black.withOpacity(0.3),
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                                  const Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(width: 10),
                             // Additional images
                             Expanded(
-                              child: ListView(
+                              child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
-                                children: List.generate(
-                                  3,
-                                  (index) => Container(
+                                itemCount: 3,
+                                itemBuilder: (context, index) {
+                                  return Container(
                                     width: 80,
                                     height: 80,
                                     margin: const EdgeInsets.only(right: 8),
@@ -568,8 +571,8 @@ class _AddProductPageState extends State<AddProductPage> {
                                       color: Colors.grey,
                                       size: 30,
                                     ),
-                                  ),
-                                ),
+                                  );
+                                },
                               ),
                             ),
                           ],
@@ -582,7 +585,7 @@ class _AddProductPageState extends State<AddProductPage> {
                 ),
               ),
 
-              // Upload button - Modern style with floating effect
+              // Update button - Modern style with floating effect
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
@@ -597,7 +600,7 @@ class _AddProductPageState extends State<AddProductPage> {
                   ],
                 ),
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _uploadProduct,
+                  onPressed: _isLoading ? null : _updateProduct,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFD3E597),
                     foregroundColor: Colors.white,
@@ -620,10 +623,10 @@ class _AddProductPageState extends State<AddProductPage> {
                     : const Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.cloud_upload, size: 22),
+                          Icon(Icons.save, size: 22),
                           SizedBox(width: 8),
                           Text(
-                            'Upload Product',
+                            'Save Changes',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

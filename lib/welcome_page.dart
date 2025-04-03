@@ -1,6 +1,8 @@
+import 'package:Farmingapp/firebase_service.dart';
 import 'package:flutter/material.dart';
-import 'package:Farmingapp/login_page.dart';    // Import LoginPage
-import 'package:Farmingapp/signup_page.dart';   // Import SignUpPage
+import 'package:Farmingapp/login_page.dart';
+import 'package:Farmingapp/signup_page.dart';
+import 'package:flutter/foundation.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({Key? key}) : super(key: key);
@@ -24,7 +26,7 @@ class _WelcomePageState extends State<WelcomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Image.asset(
-              'assets/image2.png', // Replace with your image path
+              'assets/image2.png',
               height: 250,
             ),
             const SizedBox(height: 20),
@@ -77,10 +79,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 setState(() {
                   isSignUpPressed = true;
                 });
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignUpPage()),
-                ).then((_) {
+                Navigator.pushNamed(context, '/simple_signup').then((_) {
                   setState(() {
                     isSignUpPressed = false;
                   });

@@ -1,27 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:Farmingapp/welcome_page.dart';  // Ensure WelcomePage exists
 
-class LoadingPage extends StatefulWidget {
+class LoadingPage extends StatelessWidget {
   const LoadingPage({Key? key}) : super(key: key);
-
-  @override
-  _LoadingPageState createState() => _LoadingPageState();
-}
-
-class _LoadingPageState extends State<LoadingPage> {
-  @override
-  void initState() {
-    super.initState();
-    // Navigate to WelcomePage after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const WelcomePage()),
-        );
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +21,22 @@ class _LoadingPageState extends State<LoadingPage> {
               ),
               child: Center(
                 child: Image.asset(
-                  'assets/logo.png', // Ensure the asset is correctly added
-                  width: 100, // Adjust width as needed
-                  height: 100, // Adjust height as needed
-                  fit: BoxFit.cover, // Adjust image fit
+                  'assets/logo.png',
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    print('Error loading logo: $error');
+                    return const Icon(
+                      Icons.eco,
+                      size: 60,
+                      color: Colors.white,
+                    );
+                  },
                 ),
               ),
             ),
-            const SizedBox(height: 20), // Correctly placed SizedBox
+            const SizedBox(height: 20),
             const Text(
               "AgroLink",
               style: TextStyle(
