@@ -1,0 +1,21 @@
+// This file helps with JDK compatibility issues
+
+// Force the JVM to ignore the system version and use a compatible one
+allprojects {
+    tasks.withType(JavaCompile) {
+        options.fork = true
+        options.forkOptions.javaHome = new File(System.getenv('JAVA_HOME'))
+    }
+}
+
+// Set explicit compilation parameters
+ext {
+    flutterCompileSdkVersion = 30
+    flutterTargetSdkVersion = 30
+    
+    // Make Firebase use a compatible version with older Gradle
+    firebaseMessagingVersion = "20.3.0"
+    firebaseCoreVersion = "17.5.1"
+    firebaseAuthVersion = "19.4.0"
+    firebaseFirestoreVersion = "21.7.1"
+}

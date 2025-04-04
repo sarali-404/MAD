@@ -1,6 +1,6 @@
 {
-    "name": "agrolink",
-    "short_name": "agrolink",
+    "name": "farmingapp",
+    "short_name": "farmingapp",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
